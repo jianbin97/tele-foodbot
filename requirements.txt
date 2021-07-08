@@ -60,7 +60,6 @@ pyparsing==2.4.7
 python-dateutil 
 python-telegram-bot==13.7
 pytz==2021.1
-pywin32
 pyzmq==22.1.0
 queuelib==1.6.1
 regex==2021.7.6
