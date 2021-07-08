@@ -73,9 +73,8 @@ def main():
 
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
-                          url_path=TOKEN)
-
-    updater.bot.setWebhook(URL + TOKEN)
+                          url_path=TOKEN,
+                          webhook_url=URL + TOKEN)
 
     updater.idle()
 
