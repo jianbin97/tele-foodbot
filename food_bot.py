@@ -55,7 +55,7 @@ def find(update, context):
             url = res
             res = clean_text(res, replace, replacement, url=True)
             if re_food in res and re_place in res:
-                text_result = f'{food} can be found at {place}. \nMore Information at {url}'
+                text_result = f'{food} can be found at{place}.\nMore Information at {url}'
                 context.bot.send_message(chat_id=update.message.chat_id,
                                          text=text_result)
                 flag = 0
