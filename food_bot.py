@@ -6,6 +6,7 @@ import telegram
 from telegram.ext import Updater, CommandHandler
 from telegram import ParseMode
 from credentials import bot_token, bot_user_name, URL
+from functions import clean_text
 import os
 
 # Enable logging
@@ -23,9 +24,12 @@ bot = telegram.Bot(token=TOKEN)
 updater = Updater(token=bot_token)
 dispatcher = updater.dispatcher
 
+replace = [' ', '-', "'"]
+replacement = [''] * len(replace)
+
 def start(update, context):
     intro_text = 'Hi! To use this bot, use /find to check if the food you want \
-                  is at the place specified. :) \nThe format is: Food,Place'
+                  is at the place specified. :) \nThe format is: /find Food,Place'
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text=intro_text)
 
@@ -37,30 +41,33 @@ def find(update, context):
     if ',' in query:
         try:
             food = query.split(',')[0]
-            food = food.replace(' ', '').lower()
-            
             place = query.split(',')[1]
-            place = place.replace(' ', '').lower()
         except:
-            error_format = 'Too many , in the query, please follow the format'
+            wrong_format = 'Too many , in the query, please follow the format'
             context.bot.send_message(chat_id=update.message.chat_id, 
-                                     text=error_format)
+                                     text=wrong_format)
 
-        response = search(f'Singapore {food} {place}')[:2]
+        response = search(f'Singapore {food} {place}')
+        re_food = clean_text(food, replace, replacement)
+        re_place = clean_text(place, replace, replacement)
 
         for res in response:
-            if food in res and place in res:
-                text_result = f'{food} can be found at {place}. \
-                                More Information can be found at {res}'
+            res = clean_text(res, replace, replacement, url=True)
+            if re_food in res and re_place in res:
+                text_result = f'{food} can be found at {place}. \nMore Information \
+                                at {res}'
                 context.bot.send_message(chat_id=update.message.chat_id,
                                          text=text_result)
                 flag = 0
                 break
-        
         if flag == 1:
             text_result = f'{place} does not have {food}'
             context.bot.send_message(chat_id=update.message.chat_id,
                                         text=text_result)
+    else:
+        wrong_input = 'Unable to detect input, did you forget the ,'
+        context.bot.send_message(chat_id=update.message.chat_id, 
+                                 text=wrong_input)
 
 def main():
     start_handler = CommandHandler('start', start)
